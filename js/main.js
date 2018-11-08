@@ -22,6 +22,10 @@ function preload() {
     game.load.image('lives', 'assets/life.png');
     game.load.image('trail', 'assets/particle.png');
     game.load.image('bluetrail', 'assets/particle2.png');
+    game.load.image('l1', 'assets/letras/n1/letter_A.png');
+    game.load.image('l2', 'assets/letras/n1/letter_G.png');
+    game.load.image('l3', 'assets/letras/n1/letter_U.png');
+
 
 }
 
@@ -38,8 +42,10 @@ var scoreString;
 var ySpawn;
 var lastYSpawn;
 var xMove = 0;
+var wordLenght = 0;
 var pUActive = false;
 var backgrounds = [];
+var word1 = [];
 var backgroundScore = 200; //Version seungy
 var backgroundChange = 0;
 var backgroundChangePos = 0;
@@ -90,6 +96,11 @@ function create() {
     hearts.enableBody = true;
     hearts.physicsBodyType = Phaser.Physics.ARCADE;
 
+    //letters group 
+    letters = game.add.group();
+    letters.enableBody = true;
+    letters.physicsBodyType = Phaser.Physics.ARCADE; 
+
     //  An explosion pool for enemies
     explosions = game.add.group();
     explosions.createMultiple(30, 'kaboom');
@@ -124,15 +135,25 @@ function create() {
 
     //create enemies
     createEnemies();
-    game.time.events.repeat(Phaser.Timer.SECOND * 3, 100, createEnemies, this);    
+    game.time.events.repeat(Phaser.Timer.SECOND * 6, 100, createEnemies, this);    
 
     //create points
     createPoints();
-    game.time.events.repeat(Phaser.Timer.SECOND * 5, 100, createPoints, this);
+    game.time.events.repeat(Phaser.Timer.SECOND * 12, 100, createPoints, this);
 
     //create points
     createPowerups();
-    game.time.events.repeat(Phaser.Timer.SECOND * 8, 100, createPowerups, this);
+    game.time.events.repeat(Phaser.Timer.SECOND * 13, 100, createPowerups, this);
+
+    //create letters 
+    createLetters();
+    game.time.events.repeat(Phaser.Timer.SECOND * 5, 100, createLetters, this);
+
+    //Declaration of word (for now)
+    word1[0] = 'l1'
+    word1[1] = 'l2'
+    word1[2] = 'l3'
+    word1[3] = 'l1'
 
     //set Player values
     setPlayer();
@@ -203,7 +224,7 @@ function setPlayer(){
     jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 }
 
-function collisionHandler(player, enemies){
+function enemyCollision(player, enemies){
     //PLayers collide with enemy 
     enemies.kill();
 
@@ -239,7 +260,7 @@ function takeOffLive() {
 }
 
 //Seungy
-function playerPoints(bg, points){
+function pointsCollision(bg, points){
     //Player collides with a point
     points.kill();
     score *= 2;
@@ -248,13 +269,33 @@ function playerPoints(bg, points){
     pointExplosion.reset(points.body.x+30, points.body.y+30);
     pointExplosion.play('blueExplosion', 30, false, true);
 
-    boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, 'light');
+}
+
+function letterCollision(bg, letters){
+    //Player collides with a letter
+    letters.kill();
+    xMove += 60;
+
+    // Create an explosion 
+    var letterExplosion = pointExplosions.getFirstExists(false);
+    letterExplosion.reset(letters.body.x+30, letters.body.y+30);
+    letterExplosion.play('blueExplosion', 30, false, true);
+
+    boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, word1[wordLenght]);
     game.physics.enable(boardPoint, Phaser.Physics.ARCADE);
-    boardPoint.scale.setTo(0.05,0.05);
+    boardPoint.scale.setTo(0.2,0.2);
+
+    //Change letter
+    wordLenght += 1;
+
+    //Check Word 
+    if(word1.length == wordLenght){
+        console.log("You completed a word")
+    }
 
 }
 
-function powerupAction(player, powerups){
+function powerupCollision(player, powerups){
     //Player collides with a point
     powerups.kill();
     pUActive = true;
@@ -303,9 +344,10 @@ function restart () {
 function update() {
 
     //console.log(pUActive);
-    game.physics.arcade.overlap(player, enemies, collisionHandler, null, this);
-    game.physics.arcade.overlap(player, points, playerPoints, null, this);
-    game.physics.arcade.overlap(player, powerups, powerupAction, null, this);
+    game.physics.arcade.overlap(player, enemies, enemyCollision, null, this);
+    game.physics.arcade.overlap(player, points, pointsCollision, null, this);
+    game.physics.arcade.overlap(player, powerups, powerupCollision, null, this);
+    game.physics.arcade.overlap(player, letters, letterCollision, null, this);
 
     //Ir incrementando el score
     score += 1 //Score increment
@@ -377,15 +419,13 @@ function update() {
     if(backgroundChange == 1) {
         backgroundChange = 0;
         backgroundScore *= 10;
-        if (backgroundChangePos < 10) {
-            backgroundChangePos += 1;
-            updateBackground(backgroundChangePos);
-        }
+        backgroundChangePos += 1; //O esto esta comentado, o el if else de abajo
         // if(backgroundChangePos == 0) {
         //     backgroundChangePos = 1;
         // } else {
         //     backgroundChangePos = 0;
         // }
+        updateBackground(backgroundChangePos);
     }
 
     //Background check 
@@ -396,7 +436,6 @@ function update() {
 }
 
 function updateBackground(backgroundChangePos) {
-    console.log("gdsaga");
     backgroundSprite.loadTexture(backgrounds[backgroundChangePos]);
 }
 
@@ -405,8 +444,7 @@ function render () {
     //game.debug.text(game.time.suggestedFps, 32, 32);
 
     // game.debug.text(game.time.physicsElapsed, 32, 32);
-    // game.debug.body(player);
-    // game.debug.bodyInfo(player, 16, 24);
+    //game.debug.body(player);
 
 }
 
@@ -459,6 +497,27 @@ function createPowerups() {
         ob3.scale.setTo(0.1,0.1);
         ob3.body.setSize(1300, 1000);
         ob3.body.velocity.x = -500;
+
+    }
+
+
+}
+
+function createLetters() {
+    
+    if(pUActive == false){
+
+        //Creates random objects that give the player points 
+        lastYSpawn = ySpawn
+        ySpawn = this.game.rnd.between(0, window.innerHeight);
+        while(ySpawn >= lastYSpawn - 75 && ySpawn <= lastYSpawn + 75){
+            ySpawn = this.game.rnd.between(0, 787);
+        }
+        var ob4 = letters.create(window.innerWidth, ySpawn, word1[wordLenght]);
+        game.physics.enable(ob4, Phaser.Physics.ARCADE);
+        ob4.scale.setTo(0.3,0.3);
+        ob4.body.setSize(1300, 300);
+        ob4.body.velocity.x = -500;
 
     }
 
