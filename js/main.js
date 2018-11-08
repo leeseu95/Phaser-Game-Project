@@ -22,9 +22,12 @@ function preload() {
     game.load.image('lives', 'assets/life.png');
     game.load.image('trail', 'assets/particle.png');
     game.load.image('bluetrail', 'assets/particle2.png');
-    game.load.image('l1', 'assets/letras/n1/letter_A.png');
-    game.load.image('l2', 'assets/letras/n1/letter_G.png');
-    game.load.image('l3', 'assets/letras/n1/letter_U.png');
+    game.load.image('letterA', 'assets/letras/n1/letter_A.png');
+    game.load.image('letterG', 'assets/letras/n1/letter_G.png');
+    game.load.image('letterU', 'assets/letras/n1/letter_U.png');
+    game.load.image('letterH', 'assets/letras/n1/letter_H.png');
+    game.load.image('letterO', 'assets/letras/n1/letter_O.png');
+    game.load.image('letterJ', 'assets/letras/n1/letter_J.png');
 
 
 }
@@ -42,13 +45,19 @@ var scoreString;
 var ySpawn;
 var lastYSpawn;
 var xMove = 0;
-var wordLenght = 0;
 var pUActive = false;
 var backgrounds = [];
+var wordLength;
+var wordArray;
+var wordCount = 2;
+var wordLength = 0;
 var word1 = [];
+var word2 = [];
 var backgroundScore = 200; //Version seungy
 var backgroundChange = 0;
 var backgroundChangePos = 0;
+
+var lastHeartPos;
 
 function create() {
 
@@ -118,9 +127,11 @@ function create() {
 
     //Lives
     for (i = 0; i < 3; i++){
-        var life = hearts.create((window.innerWidth-200) + (i*50), 50, 'lives');
+        lastHeartPos = (window.innerWidth - 200) + (i*50);
+        var life = hearts.create(lastHeartPos, 50, 'lives');
         life.scale.setTo(0.1,0.1);
     }
+    lastHeartPos = window.innerWidth - 200;
 
     backgrounds[0] = 'bg0';
     backgrounds[1] = 'bg1';
@@ -145,15 +156,24 @@ function create() {
     createPowerups();
     game.time.events.repeat(Phaser.Timer.SECOND * 13, 100, createPowerups, this);
 
-    //create letters 
+    //Declaration of word
+    word1[0] = 'letterA';
+    word1[1] = 'letterG';
+    word1[2] = 'letterU';
+    word1[3] = 'letterA';
+
+    //Declaration of word 
+    word2[0] = 'letterH';
+    word2[1] = 'letterO';
+    word2[2] = 'letterJ';
+    word2[3] = 'letterA';
+
+    // console.log(wordArray);
+    createWordArray();
+
+    //create letters
     createLetters();
     game.time.events.repeat(Phaser.Timer.SECOND * 5, 100, createLetters, this);
-
-    //Declaration of word (for now)
-    word1[0] = 'l1'
-    word1[1] = 'l2'
-    word1[2] = 'l3'
-    word1[3] = 'l1'
 
     //set Player values
     setPlayer();
@@ -244,6 +264,7 @@ function enemyCollision(player, enemies){
 function takeOffLive() {
     live = hearts.getFirstAlive();
     if (live){
+        lastHeartPos += 50;
         live.kill();
     }
     if (hearts.countLiving() < 1) //If lives are over, you lose
@@ -256,6 +277,14 @@ function takeOffLive() {
 
         //the "click to restart" handler
         game.input.onTap.addOnce(restart,this);
+    }
+}
+
+function addLive() {
+    lastHeartPos -= 50;
+    for (i = 0; i < 2; i++){
+        var life = hearts.create(lastHeartPos - (i*50), 50, 'lives');
+        life.scale.setTo(0.1,0.1);
     }
 }
 
@@ -281,16 +310,20 @@ function letterCollision(bg, letters){
     letterExplosion.reset(letters.body.x+30, letters.body.y+30);
     letterExplosion.play('blueExplosion', 30, false, true);
 
-    boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, word1[wordLenght]);
+    //Agregarlo al top
+    boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, wordArray[wordLength]);
     game.physics.enable(boardPoint, Phaser.Physics.ARCADE);
     boardPoint.scale.setTo(0.2,0.2);
 
     //Change letter
-    wordLenght += 1;
+    wordLength += 1;
 
     //Check Word 
-    if(word1.length == wordLenght){
-        console.log("You completed a word")
+    if(wordArray.length == wordLength){
+        console.log("You completed a word");
+        wordLength = 0;
+        addLive();
+        createWordArray();
     }
 
 }
@@ -503,6 +536,16 @@ function createPowerups() {
 
 }
 
+function createWordArray() {
+    var randWord = Math.floor((Math.random() * wordCount)); //Crear un numero entre 0 y cantiad de palabras que existen
+
+    if(randWord == 0)
+        wordArray = word1;
+    if(randWord == 1)
+        wordArray = word2;
+
+}
+
 function createLetters() {
     
     if(pUActive == false){
@@ -513,7 +556,7 @@ function createLetters() {
         while(ySpawn >= lastYSpawn - 75 && ySpawn <= lastYSpawn + 75){
             ySpawn = this.game.rnd.between(0, 787);
         }
-        var ob4 = letters.create(window.innerWidth, ySpawn, word1[wordLenght]);
+        var ob4 = letters.create(window.innerWidth, ySpawn, wordArray[wordLength]);
         game.physics.enable(ob4, Phaser.Physics.ARCADE);
         ob4.scale.setTo(0.3,0.3);
         ob4.body.setSize(1300, 300);
