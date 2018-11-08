@@ -57,6 +57,8 @@ var backgroundScore = 200; //Version seungy
 var backgroundChange = 0;
 var backgroundChangePos = 0;
 
+var boardPointUI = [];
+
 var lastHeartPos;
 
 function create() {
@@ -314,7 +316,7 @@ function letterCollision(bg, letters){
     boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, wordArray[wordLength]);
     game.physics.enable(boardPoint, Phaser.Physics.ARCADE);
     boardPoint.scale.setTo(0.2,0.2);
-
+    boardPointUI.push(boardPoint);
     //Change letter
     wordLength += 1;
 
@@ -322,9 +324,13 @@ function letterCollision(bg, letters){
     if(wordArray.length == wordLength){
         console.log("You completed a word");
         wordLength = 0;
+        xMove = 0;
         addLive();
         createWordArray();
-    }
+        for(let i = 0; i < boardPointUI.length; i++) {
+            boardPointUI[i].kill();
+        }
+        }
 
 }
 
