@@ -32,8 +32,8 @@ var counterHearts;
 
 var swapDifficulty = true;
 
-//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes, arreglar collisiones
-//TODO: Sound effects, scoring
+//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes, arreglar collisiones, agregar efectos cuando completas un array
+//TODO: Sound effects
 
 //Font
 WebFontConfig = {
@@ -532,7 +532,7 @@ var gameState = {
         //Player collides with a point
         points.kill();
         waterSound.play();
-        score *= 2;
+        score += 500;
         // Create an explosion 
         var pointExplosion = pointExplosions.getFirstExists(false);
         pointExplosion.reset(points.body.x+30, points.body.y+30);
@@ -704,7 +704,7 @@ var gameState = {
     
         if(backgroundChange == 1) {
             backgroundChange = 0;
-            backgroundScore *= 10;
+            backgroundScore += 7000;
             backgroundChangePos += 1; //O esto esta comentado, o el if else de abajo
             // if(backgroundChangePos == 0) {
             //     backgroundChangePos = 1;
