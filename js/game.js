@@ -32,7 +32,8 @@ var counterHearts;
 
 var swapDifficulty = true;
 
-//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes, arreglar collisiones, agregar efectos cuando completas un array
+//TODO Lucia : Arreglar lo de dificultad de nivel, cambiar velocidad si puedes (por nivel), arreglar collisiones, agregar efectos cuando completas un array
+//TODO Alonso : Arreglar nubes o gases (que se vean como gases), arreglar howtoplay
 //TODO: Sound effects
 
 //Font
@@ -113,12 +114,17 @@ var gameState = {
         game.load.image('letterX', 'assets/level'+level+'/letras/letter_X.png');
         game.load.image('letterZ', 'assets/level'+level+'/letras/letter_Z.png');
         //Sounds -- TODO ALONSO
+        //Level 1
         game.load.audio('waterSound', 'assets/audio/digital/laser1.ogg'); //Efecto cuando chocamos con puntos
         game.load.audio('gasSound', 'assets/audio/digital/pepSound3.ogg'); //Efecto cuando chocamos con enemigo gas
         game.load.audio('powerUpSound', 'assets/audio/digital/powerUp1.ogg'); //Efecto cuando chocamos con una nave
+        game.load.audio('letterSound', 'assets/audio/digital/lowDown.ogg'); //Efecto cuando chocamos con una letra
+        game.load.audio('wordCompleted', 'assets/audio/digital/powerUp11.ogg'); //Efecto cuando completamos una palabra
+        game.load.audio('jetpackSound', 'assets/audio/digital/phaseJump2.ogg'); //Sonidos para brincar
+        game.load.audio('walkingSound', 'assets/audio/digital/phaserUp5.ogg'); //Sonidos para caminar
         game.load.audio('bgm1', 'assets/audio/FamiliarRoads.ogg'); //BGM
+        //Level 2
         //Fonts
-        // this.game.load.bitmapFont('myfont', 'assets/fonts/GH.otf');
         game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
         },
 
@@ -200,6 +206,10 @@ var gameState = {
         if(level == 1) {
             waterSound = game.add.audio('waterSound');
             gasSound = game.add.audio('gasSound');
+            wordCompletedSound = game.add.audio('wordCompleted');
+            jetpackSound = game.add.audio('jetpackSound');
+            letterSound = game.add.audio('letterSound');
+            walkingSound = game.add.audio('walkingSound');
             bgmMusic = game.add.audio('bgm1');
             bgmMusic.loop = true;
         } else if (level == 2) {
@@ -544,6 +554,7 @@ var gameState = {
         //Player collides with a letter
         letters.kill();
         xMove += 60;
+        letterSound.play();
 
         // Create an explosion 
         var letterExplosion = pointExplosions.getFirstExists(false);
@@ -561,6 +572,7 @@ var gameState = {
         //Check Word 
         if(wordArray.length == wordLength){
             console.log("You completed a word");
+            wordCompletedSound.play();
             wordLength = 0;
             xMove = 0;
             this.addLive();
@@ -647,10 +659,12 @@ var gameState = {
         //Player animation
         if (cursors.left.isDown)
         {
+            walkingSound.play("", 0, 1, false, true);
             player.x -= 8;
         }
         else if (cursors.right.isDown && (player.body.x < 200))
         {
+            walkingSound.play("", 0, 1, false, true);
             player.x += 8;
         }
         if (player.body.onFloor())
@@ -684,6 +698,7 @@ var gameState = {
         {
             // player.animations.stop();
             player.animations.play('jump');
+            jetpackSound.play("", 0, 1, false, true);
             player.body.velocity.y = -300
             player.body.acceleration.y = 600;
             emitter.on = true;
