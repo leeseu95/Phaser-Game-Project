@@ -33,7 +33,7 @@ var counterHearts;
 var swapDifficulty = true;
 
 //TODO Lucia : Arreglar lo de dificultad de nivel, cambiar velocidad si puedes (por nivel), arreglar collisiones, agregar efectos cuando completas un array
-//TODO Alonso : Arreglar nubes o gases (que se vean como gases), arreglar howtoplay
+//TODO Alonso : Arreglar nubes o gases (que se vean como gases), arreglar howtoplay, Agregar sonidos
 
 //Font
 WebFontConfig = {
