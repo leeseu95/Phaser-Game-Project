@@ -32,8 +32,23 @@ var counterHearts;
 
 var swapDifficulty = true;
 
-//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes
-//TODO: Sound effects, fonts, big sprites
+//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes, arreglar collisiones
+//TODO: Sound effects, scoring
+
+//Font
+WebFontConfig = {
+
+    //  'active' means all requested fonts have finished loading
+    //  We set a 1 second delay before calling 'createText'.
+    //  For some reason if we don't the browser cannot render the text the first time it's created.
+    // active: function() { game.time.events.add(Phaser.Timer.SECOND, gameState.createText, this); },
+
+    //  The Google Fonts we want to load (specify as many as you like in the array)
+    google: {
+      families: ['Revalia']
+    }
+
+};
 
 var gameState = {
 
@@ -102,6 +117,9 @@ var gameState = {
         game.load.audio('gasSound', 'assets/audio/digital/pepSound3.ogg'); //Efecto cuando chocamos con enemigo gas
         game.load.audio('powerUpSound', 'assets/audio/digital/powerUp1.ogg'); //Efecto cuando chocamos con una nave
         game.load.audio('bgm1', 'assets/audio/FamiliarRoads.ogg'); //BGM
+        //Fonts
+        // this.game.load.bitmapFont('myfont', 'assets/fonts/GH.otf');
+        game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
         },
 
     create:function() {
@@ -130,13 +148,12 @@ var gameState = {
         player = game.add.sprite(20, 300, 'dude');
         game.physics.enable(player, Phaser.Physics.ARCADE);
     
-        //  The score
-        scoreText = game.add.text(10, 10, 'Score: ', { font: '34px Arial', fill: '#000' });
-    
-        //  Text
-        stateText = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#000' });
-        stateText.anchor.setTo(0.5, 0.5);
-        stateText.visible = false;    
+        // //  The score
+        // scoreText = game.add.text(10, 10, "Score: ");
+        // scoreText.font = 'Revalia';
+        // scoreText.fontSize = '60';
+        // scoreText.fill = "#ff0ff";
+        this.createText();
     
         //Enemies group
         enemies = game.add.group();
@@ -347,6 +364,38 @@ var gameState = {
     
     },
     
+    createText:function(){
+        //  The score
+        scoreText = game.add.text(10, 10, "Score: ");
+        scoreText.font = 'Revalia';
+        scoreText.fontSize = '34px';
+        scoreText.fill = "#ff0ff";
+
+        grd = scoreText.context.createLinearGradient(0, 0, 0, scoreText.canvas.height);
+        grd.addColorStop(0, '#8ED6FF');   
+        grd.addColorStop(1, '#004CB3');
+        scoreText.fill = grd;
+        scoreText.stroke = '#000000';
+        scoreText.strokeThickness = 2;
+        scoreText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
+
+        //  Text End of game
+        stateText = game.add.text(game.world.centerX, game.world.centerY, "Score: ");
+        stateText.anchor.setTo(0.5, 0.5);
+        stateText.font = 'Revalia';
+        stateText.fontSize = '64px';
+        stateText.fill = "#ff0ff";
+
+        grd = stateText.context.createLinearGradient(0, 0, 0, stateText.canvas.height);
+        grd.addColorStop(0, '#8ED6FF');   
+        grd.addColorStop(1, '#004CB3');
+        stateText.fill = grd;
+        stateText.stroke = '#000000';
+        stateText.strokeThickness = 2;
+        stateText.setShadow(5, 5, 'rgba(0,0,0,0.5)', 5);
+        stateText.visible = false;    
+    },
+
     setEmitter:function(){
         emitter = game.add.emitter(player.body.x, 500, 200);
     
