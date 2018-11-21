@@ -8,10 +8,46 @@ var charactersState = {
     },
 
     backAction: function () {game.state.start('levels')},
-    charOne: function () {game.state.start('intro', true, false, 1, level)},
-    charTwo: function () {game.state.start('intro', true, false, 2, level)},
-    charThree: function () {game.state.start('intro', true, false, 3, level)},
-    charFour: function () {game.state.start('intro', true, false, 4, level)},
+    charOne: function () {
+        // guardar a variables globales
+        // para acceder: game.global.playerName
+        game.global = {
+            playerName : textInput.value,
+            playerScore : 0
+        };
+        console.log("Saved", game.global.playerName, "as the player's name to global variables");
+        game.state.start('intro', true, false, 1, level);
+    },
+    charTwo: function () {
+        // guardar a variables globales
+        // para acceder: game.global.playerName
+        game.global = {
+            playerName : textInput.value,
+            playerScore : 0
+        };
+        console.log("Saved", game.global.playerName, "as the player's name to global variables");
+        game.state.start('intro', true, false, 2, level);
+    },
+    charThree: function () {
+        // guardar a variables globales
+        // para acceder: game.global.playerName
+        game.global = {
+            playerName : textInput.value,
+            playerScore : 0
+        };
+        console.log("Saved", game.global.playerName, "as the player's name to global variables");
+        game.state.start('intro', true, false, 3, level);
+    },
+    charFour: function () {
+        // guardar a variables globales
+        // para acceder: game.global.playerName
+        game.global = {
+            playerName : textInput.value,
+            playerScore : 0
+        };
+        console.log("Saved", game.global.playerName, "as the player's name to global variables");
+        game.state.start('intro', true, false, 4, level)
+    },
 
     preload: function() {
 
@@ -39,6 +75,23 @@ var charactersState = {
         c2 = game.add.sprite(game.world.centerX-200,game.world.centerY-80, 'char2');
         c3 = game.add.sprite(game.world.centerX+200,game.world.centerY-80, 'char3');
         c4 = game.add.sprite(game.world.centerX+400,game.world.centerY-80, 'char4');
+
+        // importar el plugin
+        game.add.plugin(PhaserInput.Plugin);
+
+        textInput = game.add.inputField(game.world.centerX, game.world.centerY, {
+            font: '20px Arial',
+            fill: '#212121',
+            fontWeight: 'bold',
+            width: 150,
+            padding: 8,
+            borderWidth: 1,
+            borderColor: '#000',
+            forceCase: PhaserInput.ForceCase.upper,
+            borderRadius: 6,
+            placeHolder: 'Name',
+            type: PhaserInput.InputType.text
+        });
 
         // Botones
         l1_button = game.add.button(game.world.centerX-400,game.world.centerY+80,'p_button', this.charOne, this, 2, 1, 0)

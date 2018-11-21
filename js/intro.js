@@ -35,18 +35,18 @@ var introState = {
         // DESCOMENTAR ESTAS LÍNEAS Y BORRAR LA LÍNEA 49 PARA QUE JALE EL INTRO VIDEO
         
         // play el video
-        video = game.add.video('intro');
-        ratio = window.innerWidth/video.width;
-        video.play(true);
+        // video = game.add.video('intro');
+        // ratio = window.innerWidth/video.width;
+        // video.play(true);
 
-        //  x, y, anchor x, anchor y, scale x, scale y
-        video.addToWorld(0, 0, 0, 0, ratio, ratio);
+        // //  x, y, anchor x, anchor y, scale x, scale y
+        // video.addToWorld(0, 0, 0, 0, ratio, ratio);
 
-        getReady = setTimeout(function(){
-            game.state.start('game', true, false, character, level);
-            video.destroy();
-        }, (video.duration*1000)-100)
-        // game.state.start('game', true, false, character, level);
+        // getReady = setTimeout(function(){
+        //     game.state.start('game', true, false, character, level);
+        //     video.destroy();
+        // }, (video.duration*1000)-100)
+        game.state.start('game', true, false, character, level);
     },
 
     create: function (){

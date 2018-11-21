@@ -31,14 +31,32 @@ var menuState = {
     creditsAction: function () {game.state.start('credits')},
     playAction: function () {game.state.start('levels')},
     howAction: function () {game.state.start('how')},
-    scoresAction: function () {game.state.start('scores')},
+    scoresAction: function () {
+        game.state.start('scores');
+    },
 
     // main function
     create: function () {
 
         game.stage.backgroundColor = '#ffff';
 
-        
+        //Inicializamos los scores
+        if(!game.globalScores || game.globalScores[0].playerScore == 0) {
+            game.globalScores = [
+                {
+                    playerName: "-",
+                    playerScore: 0
+                },
+                {
+                    playerName: "-",
+                    playerScore: 0
+                },
+                {
+                    playerName: "-",
+                    playerScore: 0
+                }
+            ];
+        }
 
         // establecer background
         background = game.add.sprite(0, 0, 'background');

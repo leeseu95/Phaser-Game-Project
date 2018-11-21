@@ -15,18 +15,25 @@ var pUActive = false;
 var backgrounds = [];
 var wordLength;
 var wordArray;
-var wordCount = 2;
+var wordCount = 3;
 var wordLength = 0;
 var word1 = [];
 var word2 = [];
+var word3 = [];
 var backgroundScore = 200; //Version seungy
 var backgroundChange = 0;
 var backgroundChangePos = 0;
 
 var boardPointUI = [];
 
-var lastHeartPos;
+var lastHeartPosX;
+var lastHeartPosY;
+var counterHearts;
 
+var swapDifficulty = true;
+
+//TODO Lucia : Bug que cuando completas un array o wordCollision con la nave, no sigue (o es intended), Arreglar lo de dificultad de nivel, cambiar velocidad si puedes
+//TODO: Sound effects, fonts, big sprites
 
 var gameState = {
 
@@ -41,6 +48,7 @@ var gameState = {
 
         // game.load.spritesheet('dude', 'assets/all_levels/dude.png', 32, 48);
         // game.load.spritesheet('dude', 'assets/characters/adventurer/adventurer_tilesheet.png', 80, 110);
+        //Sprites
         game.load.spritesheet('dude', 'assets/characters/spritesheets/'+character+'.png', 80, 110);
         game.load.spritesheet('kaboom', 'assets/all_levels/kaboom.png', 128, 128);
         game.load.spritesheet('blueExplosion', 'assets/all_levels/blue.png', 128, 128);
@@ -48,6 +56,7 @@ var gameState = {
         game.load.image('enemy', 'assets/level'+level+'/obs_gas.png');
         game.load.image('light', 'assets/level'+level+'/obj.png');
         game.load.image('ovni', 'assets/all_levels/ovni.png');
+        //Backgrounds
         game.load.image('bg0', 'assets/level'+level+'/bgs/bg_0_new.png');
         game.load.image('bg1', 'assets/level'+level+'/bgs/bg_1_new.png');
         game.load.image('bg2', 'assets/level'+level+'/bgs/bg_2_new.png');
@@ -61,13 +70,39 @@ var gameState = {
         game.load.image('lives', 'assets/all_levels/life.png');
         game.load.image('trail', 'assets/all_levels/particle.png');
         game.load.image('bluetrail', 'assets/all_levels/particle2.png');
+        //Leters (for word arrays)
         game.load.image('letterA', 'assets/level'+level+'/letras/letter_A.png');
+        game.load.image('letterB', 'assets/level'+level+'/letras/letter_B.png');
+        game.load.image('letterC', 'assets/level'+level+'/letras/letter_C.png');
+        game.load.image('letterD', 'assets/level'+level+'/letras/letter_D.png');
+        game.load.image('letterE', 'assets/level'+level+'/letras/letter_E.png');
+        game.load.image('letterF', 'assets/level'+level+'/letras/letter_F.png');
         game.load.image('letterG', 'assets/level'+level+'/letras/letter_G.png');
-        game.load.image('letterU', 'assets/level'+level+'/letras/letter_U.png');
         game.load.image('letterH', 'assets/level'+level+'/letras/letter_H.png');
-        game.load.image('letterO', 'assets/level'+level+'/letras/letter_O.png');
+        game.load.image('letterI', 'assets/level'+level+'/letras/letter_I.png');
         game.load.image('letterJ', 'assets/level'+level+'/letras/letter_J.png');
-    },
+        game.load.image('letterK', 'assets/level'+level+'/letras/letter_K.png');
+        game.load.image('letterL', 'assets/level'+level+'/letras/letter_L.png');
+        game.load.image('letterM', 'assets/level'+level+'/letras/letter_M.png');
+        game.load.image('letterN', 'assets/level'+level+'/letras/letter_N.png');
+        game.load.image('letterP', 'assets/level'+level+'/letras/letter_P.png');
+        game.load.image('letterO', 'assets/level'+level+'/letras/letter_O.png');
+        game.load.image('letterQ', 'assets/level'+level+'/letras/letter_Q.png');
+        game.load.image('letterR', 'assets/level'+level+'/letras/letter_R.png');
+        game.load.image('letterS', 'assets/level'+level+'/letras/letter_S.png');
+        game.load.image('letterT', 'assets/level'+level+'/letras/letter_T.png');
+        game.load.image('letterU', 'assets/level'+level+'/letras/letter_U.png');
+        game.load.image('letterV', 'assets/level'+level+'/letras/letter_V.png');
+        game.load.image('letterY', 'assets/level'+level+'/letras/letter_Y.png');
+        game.load.image('letterW', 'assets/level'+level+'/letras/letter_W.png');
+        game.load.image('letterX', 'assets/level'+level+'/letras/letter_X.png');
+        game.load.image('letterZ', 'assets/level'+level+'/letras/letter_Z.png');
+        //Sounds -- TODO ALONSO
+        game.load.audio('waterSound', 'assets/audio/digital/laser1.ogg'); //Efecto cuando chocamos con puntos
+        game.load.audio('gasSound', 'assets/audio/digital/pepSound3.ogg'); //Efecto cuando chocamos con enemigo gas
+        game.load.audio('powerUpSound', 'assets/audio/digital/powerUp1.ogg'); //Efecto cuando chocamos con una nave
+        game.load.audio('bgm1', 'assets/audio/FamiliarRoads.ogg'); //BGM
+        },
 
     create:function() {
 
@@ -142,14 +177,32 @@ var gameState = {
         powerupExplosions = game.add.group();
         powerupExplosions.createMultiple(30, 'greenExplosion');
         powerupExplosions.forEach(this.setupPowerup, this);
-    
+        
+        //Audios
+        //TODO ALONSO : Agregar aqui los diferentes sonidos igual que como estan en nivel 1 (pero dependiendo)
+        if(level == 1) {
+            waterSound = game.add.audio('waterSound');
+            gasSound = game.add.audio('gasSound');
+            bgmMusic = game.add.audio('bgm1');
+            bgmMusic.loop = true;
+        } else if (level == 2) {
+
+        } else if (level == 3) {
+
+        }
+
+        //Insert all audios
+        // game.sound.setDecodedCallback([waterSound, gasSound], create, this);
+
         //Lives
         for (i = 0; i < 3; i++){
-            lastHeartPos = (window.innerWidth - 200) + (i*50);
-            var life = hearts.create(lastHeartPos, 50, 'lives');
+            lastHeartPosX = (window.innerWidth - 50) - (i*50);
+            var life = hearts.create(lastHeartPosX, 50, 'lives');
             life.scale.setTo(0.1,0.1);
         }
-        lastHeartPos = window.innerWidth - 200;
+        lastHeartPosX = window.innerWidth - 50;
+        lastHeartPosY = 100;
+        counterHearts = 0;
     
         backgrounds[0] = 'bg0';
         backgrounds[1] = 'bg1';
@@ -172,19 +225,110 @@ var gameState = {
     
         //create points
         this.createPowerups();
-        game.time.events.repeat(Phaser.Timer.SECOND * 8, 100, this.createPowerups, this);
+        game.time.events.repeat(Phaser.Timer.SECOND * 15, 100, this.createPowerups, this);
 
-        //Declaration of word
-        word1[0] = 'letterA';
-        word1[1] = 'letterG';
-        word1[2] = 'letterU';
-        word1[3] = 'letterA';
+        //Crear palabras dependiendo del nivel
+        if(level == 1) {
+            //Palabra 1
+            word1[0] = 'letterR';
+            word1[1] = 'letterE';
+            word1[2] = 'letterD';
+            word1[3] = 'letterU';
+            word1[4] = 'letterC';
+            word1[5] = 'letterI';
+            word1[6] = 'letterR';
 
-        //Declaration of word 
-        word2[0] = 'letterH';
-        word2[1] = 'letterO';
-        word2[2] = 'letterJ';
-        word2[3] = 'letterA';
+            //Palabra 2
+            word2[0] = 'letterE';
+            word2[1] = 'letterC';
+            word2[2] = 'letterO';
+            word2[3] = 'letterS';
+            word2[4] = 'letterI';
+            word2[5] = 'letterS';
+            word2[6] = 'letterT';
+            word2[7] = 'letterE';
+            word2[8] = 'letterM';
+            word2[9] = 'letterA';
+            
+            //Palabra 3
+            word3[0] = 'letterA';
+            word3[1] = 'letterT';
+            word3[2] = 'letterM';
+            word3[3] = 'letterO';
+            word3[4] = 'letterS';
+            word3[5] = 'letterF';
+            word3[6] = 'letterE';
+            word3[7] = 'letterR';
+            word3[8] = 'letterA';
+
+        } else if (level == 2) {
+            //Palabra 1
+            word1[0] = 'letterC';
+            word1[1] = 'letterO';
+            word1[2] = 'letterN';
+            word1[3] = 'letterC';
+            word1[4] = 'letterI';
+            word1[5] = 'letterE';
+            word1[6] = 'letterN';
+            word1[7] = 'letterC';
+            word1[8] = 'letterI';
+            word1[9] = 'letterA';
+
+            //Palabra 2
+            word2[0] = 'letterP';
+            word2[1] = 'letterU';
+            word2[2] = 'letterR';
+            word2[3] = 'letterI';
+            word2[4] = 'letterF';
+            word2[5] = 'letterI';
+            word2[6] = 'letterC';
+            word2[7] = 'letterA';
+            word2[8] = 'letterR';
+            
+            //Palabra 3
+            word3[0] = 'letterR';
+            word3[1] = 'letterE';
+            word3[2] = 'letterU';
+            word3[3] = 'letterT';
+            word3[4] = 'letterI';
+            word3[5] = 'letterL';
+            word3[6] = 'letterI';
+            word3[7] = 'letterZ';
+            word3[8] = 'letterA';
+            word3[9] = 'letterR';
+        } else if (level == 3) {
+            //Palabra 1
+            word1[0] = 'letterR';
+            word1[1] = 'letterE';
+            word1[2] = 'letterC';
+            word1[3] = 'letterI';
+            word1[4] = 'letterC';
+            word1[5] = 'letterL';
+            word1[6] = 'letterA';
+            word1[7] = 'letterR';
+
+            //Palabra 2
+            word2[0] = 'letterR';
+            word2[1] = 'letterE';
+            word2[2] = 'letterN';
+            word2[3] = 'letterO';
+            word2[4] = 'letterV';
+            word2[5] = 'letterA';
+            word2[6] = 'letterB';
+            word2[7] = 'letterL';
+            word2[8] = 'letterE';
+            
+            //Palabra 3
+            word3[0] = 'letterS';
+            word3[1] = 'letterU';
+            word3[2] = 'letterS';
+            word3[3] = 'letterT';
+            word3[4] = 'letterE';
+            word3[5] = 'letterN';
+            word3[6] = 'letterT';
+            word3[7] = 'letterA';
+            word3[8] = 'letterR';
+        }
 
         // console.log(wordArray);
         this.createWordArray();
@@ -199,6 +343,7 @@ var gameState = {
     
         this.setEmitter();
         
+        bgmMusic.play();
     
     },
     
@@ -271,6 +416,7 @@ var gameState = {
 
     collisionHandler:function(player, enemies){
         //PLayers collide with enemy 
+        gasSound.play();
         enemies.kill();
     
         // Create an explosion 
@@ -294,33 +440,49 @@ var gameState = {
     takeOffLive:function() {
         live = hearts.getFirstAlive();
         if (live){
-            lastHeartPos += 50;
             live.kill();
         }
         if (hearts.countLiving() < 1) //If lives are over, you lose
         {
+            //Agregamos puntos al main
+            game.global.playerScore = score;
+            //Funcion para reemplazar los puntos
+            for(let i = 0; i < 3; i ++) {
+                if(game.global.playerScore > game.globalScores[i].playerScore) {
+                    game.globalScores.splice(i, 0, game.global);
+                    break;
+                } else {
+                    
+                }
+            }
+            console.log(game.globalScores[0].playerName);
             player.kill();
             enemies.kill();
+            bgmMusic.stop();
 
-            stateText.text=" GAME OVER \n Click to restart";
+            stateText.text="       GAME OVER \n Click to go to Menu \n       Score: " + score;
             stateText.visible = true;
 
             //the "click to restart" handler
-            game.input.onTap.addOnce(restart,this);
+            game.input.onTap.addOnce(this.restartGame,this);
         }
     },
 
     addLive:function() {
-        lastHeartPos -= 50;
-        for (i = 0; i < 2; i++){
-            var life = hearts.create(lastHeartPos - (i*50), 50, 'lives');
-            life.scale.setTo(0.1,0.1);
+        if(counterHearts == 5) {
+            lastHeartPosX = window.innerWidth - 50;
+            lastHeartPosY += 50;
         }
+        var life = hearts.create(lastHeartPosX, lastHeartPosY, 'lives');
+        life.scale.setTo(0.1,0.1);
+        lastHeartPosX -= 50;
+        counterHearts += 1;
     },
 
     playerPoints:function(bg, points){
         //Player collides with a point
         points.kill();
+        waterSound.play();
         score *= 2;
         // Create an explosion 
         var pointExplosion = pointExplosions.getFirstExists(false);
@@ -340,7 +502,7 @@ var gameState = {
         letterExplosion.play('blueExplosion', 30, false, true);
 
         //Agregarlo al top
-        boardPoint = game.add.sprite((window.innerWidth-1000) + xMove, 30, wordArray[wordLength]);
+        boardPoint = game.add.sprite((window.innerWidth-1100) + xMove, 30, wordArray[wordLength]);
         game.physics.enable(boardPoint, Phaser.Physics.ARCADE);
         boardPoint.scale.setTo(0.2,0.2);
         boardPointUI.push(boardPoint);
@@ -352,12 +514,12 @@ var gameState = {
             console.log("You completed a word");
             wordLength = 0;
             xMove = 0;
-            addLive();
-            createWordArray();
+            this.addLive();
+            this.createWordArray();
             for(let i = 0; i < boardPointUI.length; i++) {
                 boardPointUI[i].kill();
             }
-            }
+        }
     },
     
     powerupAction:function(player, powerups){
@@ -388,8 +550,8 @@ var gameState = {
         player.scale.setTo(1,1);
     },
     
-    restart:function () {
-        //  A new level starts
+    restartGame:function (){
+        // //  A new level starts
     
         //Reset background
         g_background.loadTexture('background');
@@ -403,9 +565,12 @@ var gameState = {
         }
         //revives the player
         player.revive();
+        //Reiniciamos word array a 0
+        wordLength = 0;
         //hides the text
         stateText.visible = false;
-    
+        console.log(game.global.playerName, game.global.playerScore);
+        game.state.start('menu'); //Reiniciar al menu despues de perder
     },
     
     update:function() {
@@ -420,8 +585,10 @@ var gameState = {
     
         //Ir incrementando el score
         score += 1 //Score increment
+
+        // player.body.velocity.x += .05
     
-        scoreText.text= "Score: " + score; //Change score board
+        scoreText.text= "Player: " + game.global.playerName + "\nScore: " + score; //Change score board
     
         // console.log(window.innerHeight);
         // console.log(score)
@@ -520,17 +687,27 @@ var gameState = {
         //enemiesY = 175 / 325
         //enemiesY >= pointsY - 75 && 
         //Create the random enemies
+        if(swapDifficulty == true) {swapDifficulty = false}
+        else {swapDifficulty = true}
+        console.log(swapDifficulty);
+
         lastYSpawn = ySpawn
         ySpawn = this.game.rnd.between(0, window.innerHeight);
         while(ySpawn >= lastYSpawn - 50 && ySpawn <= lastYSpawn + 50){
             ySpawn = this.game.rnd.between(0, 787);
         }
+
         var ob = enemies.create(window.innerWidth, ySpawn, 'enemy');
         game.physics.enable(ob, Phaser.Physics.ARCADE);
         ob.scale.setTo(0.3,0.3)
         ob.body.velocity.x = -500;
-        //game.physics.arcade.moveToObject(ob,player,120) // el objeto sigue al usuario (es más difícil)
-    
+
+        //TODO LUCIA
+        if(level == 2) 
+            game.physics.arcade.moveToObject(ob, player, 120) // el objeto sigue al usuario (es más difícil)
+
+        if(level == 3 && swapDifficulty == true)
+            game.physics.arcade.moveToObject(ob, player, 120)
     },
     
     createPoints:function() {
@@ -578,12 +755,14 @@ var gameState = {
             wordArray = word1;
         if(randWord == 1)
             wordArray = word2;
+        if(randWord == 2)
+            wordArray = word3;
     
+        console.log("word", wordArray);
     },
 
     createLetters:function(){
         if(pUActive == false){
-
             //Creates random objects that give the player points 
             lastYSpawn = ySpawn
             ySpawn = this.game.rnd.between(0, window.innerHeight);
@@ -595,8 +774,30 @@ var gameState = {
             ob4.scale.setTo(0.3,0.3);
             ob4.body.setSize(1300, 300);
             ob4.body.velocity.x = -500;
-    
         }
     },
+
+    //Sounds
+    playFx:function(key) {
+
+        switch (key.keyCode)
+        {
+            case Phaser.Keyboard.ONE:
+                text1.text = "Blaster: Playing";
+                blaster.play();
+                break;
+    
+            case Phaser.Keyboard.TWO:
+                text2.text = "Explosion: Playing";
+                explosion.play();
+                break;
+    
+            case Phaser.Keyboard.THREE:
+                text3.text = "Sword: Playing";
+                sword.play();
+                break;
+        }
+    
+    }
 }
 
