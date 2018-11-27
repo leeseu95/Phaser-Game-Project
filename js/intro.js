@@ -1,7 +1,9 @@
 var introState = {
 
     preload: function(){
-        game.load.video('intro', 'assets/video/intro.mp4');
+        game.load.video('intro', 'assets/video/hyperspace.mp4');
+        //sound
+        game.load.audio('type', 'assets/audio/new/type.wav'); //typing sound
     },
 
     init: function(charParam, levelParam) {
@@ -25,28 +27,43 @@ var introState = {
 
     backAction: function () {
         this.textClean()
-        game.state.start('menu')},
+        typeSound.stop()
+        game.state.start('menu')
+    },
+
+    skipAction: function () {
+        this.textClean();
+        typeSound.stop();
+        video.destroy();
+        window.clearTimeout(getReady);
+        game.state.start('game', true, false, character, level);
+    },
 
     goAction: function () {
         
         // limpiar el texto
         this.textClean()
 
+        typeSound.stop();
+
         // DESCOMENTAR ESTAS LÍNEAS Y BORRAR LA LÍNEA 49 PARA QUE JALE EL INTRO VIDEO
         
         // play el video
-        // video = game.add.video('intro');
-        // ratio = window.innerWidth/video.width;
-        // video.play(true);
+        video = game.add.video('intro');
+        ratio = window.innerWidth/video.width;
+        video.play(true);
 
-        // //  x, y, anchor x, anchor y, scale x, scale y
-        // video.addToWorld(0, 0, 0, 0, ratio, ratio);
+        introSound.stop();
 
-        // getReady = setTimeout(function(){
-        //     game.state.start('game', true, false, character, level);
-        //     video.destroy();
-        // }, (video.duration*1000)-100)
-        game.state.start('game', true, false, character, level);
+        //  x, y, anchor x, anchor y, scale x, scale y
+        video.addToWorld(0, 0, 0, 0, ratio, ratio);
+
+        s_button = game.add.button(0, 0, 's_button', this.skipAction, this, 2, 1, 0);
+
+        getReady = setTimeout(function(){
+            game.state.start('game', true, false, character, level);
+            video.destroy();
+        }, (video.duration*1000)-100)
     },
 
     create: function (){
@@ -88,12 +105,21 @@ var introState = {
                 console.log(otherDiv)
                 element = document.getElementById("line" + index + "")
                 element.insertAdjacentHTML("afterend", otherDiv);
+                
+                if (index == textArray.length-1) {
+                    typeSound.stop();
+                }
+
             }, timeout*(index+1));
         }
 
         b_button = game.add.button(game.world.width/30, game.world.height/6*5, 'b_button', this.backAction, this, 2, 1, 0);
 
         g_button = game.add.button(game.world.centerX-95, game.world.centerY+200, 'g_button', this.goAction, this, 2, 1, 0);
+
+        //sound
+        typeSound = game.add.audio('type');
+        typeSound.play("", 0, 2, true, false);
     },
 }
 

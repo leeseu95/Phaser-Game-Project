@@ -15,6 +15,7 @@ var pUActive = false;
 var backgrounds = [];
 var wordLength;
 var wordArray;
+var wordShadow; 
 var wordCount = 3;
 var wordLength = 0;
 var word1 = [];
@@ -32,7 +33,7 @@ var counterHearts;
 
 var swapDifficulty = true;
 
-//TODO Lucia : Arreglar lo de dificultad de nivel, cambiar velocidad si puedes (por nivel), arreglar collisiones, agregar efectos cuando completas un array
+//TODO Lucia :  arreglar collisiones, agregar efectos cuando completas un array
 //TODO Alonso : Arreglar nubes o gases (que se vean como gases), arreglar howtoplay, Agregar sonidos
 
 //Font
@@ -64,13 +65,17 @@ var gameState = {
         // game.load.spritesheet('dude', 'assets/all_levels/dude.png', 32, 48);
         // game.load.spritesheet('dude', 'assets/characters/adventurer/adventurer_tilesheet.png', 80, 110);
         //Sprites
-        game.load.spritesheet('dude', 'assets/characters/spritesheets/'+character+'.png', 80, 110);
-        game.load.spritesheet('kaboom', 'assets/all_levels/kaboom.png', 128, 128);
+        game.load.spritesheet('dude', 'assets/characters/spritesheets/'+character+'_j.png', 80, 110);
+        game.load.spritesheet('kaboom', 'assets/all_levels/kaboom.png',128, 128);
         game.load.spritesheet('blueExplosion', 'assets/all_levels/blue.png', 128, 128);
         game.load.spritesheet('greenExplosion', 'assets/all_levels/green.png', 128, 128);
+        game.load.spritesheet('starsExplosion', 'assets/all_levels/stars.png', 400, 50);
         game.load.image('enemy', 'assets/level'+level+'/obs_gas.png');
+        game.load.image('enemy2', 'assets/level'+level+'/obs.png');
         game.load.image('light', 'assets/level'+level+'/obj.png');
-        game.load.image('ovni', 'assets/all_levels/ovni.png');
+        // game.load.image('ovni', 'assets/all_levels/ovni.png');
+        game.load.image('ovni', 'assets/all_levels/ufo.png');
+        
         //Backgrounds
         game.load.image('bg0', 'assets/level'+level+'/bgs/bg_0_new.png');
         game.load.image('bg1', 'assets/level'+level+'/bgs/bg_1_new.png');
@@ -114,14 +119,15 @@ var gameState = {
         game.load.image('letterZ', 'assets/level'+level+'/letras/letter_Z.png');
         //Sounds -- TODO ALONSO
         //Level 1
-        game.load.audio('waterSound', 'assets/audio/digital/laser1.ogg'); //Efecto cuando chocamos con puntos
-        game.load.audio('gasSound', 'assets/audio/digital/pepSound3.ogg'); //Efecto cuando chocamos con enemigo gas
-        game.load.audio('powerUpSound', 'assets/audio/digital/powerUp1.ogg'); //Efecto cuando chocamos con una nave
-        game.load.audio('letterSound', 'assets/audio/digital/lowDown.ogg'); //Efecto cuando chocamos con una letra
-        game.load.audio('wordCompleted', 'assets/audio/digital/powerUp11.ogg'); //Efecto cuando completamos una palabra
-        game.load.audio('jetpackSound', 'assets/audio/digital/phaseJump2.ogg'); //Sonidos para brincar
-        game.load.audio('walkingSound', 'assets/audio/digital/phaserUp5.ogg'); //Sonidos para caminar
-        game.load.audio('bgm1', 'assets/audio/FamiliarRoads.ogg'); //BGM
+        game.load.audio('waterSound', 'assets/audio/new/point.wav'); //Efecto cuando chocamos con puntos
+        game.load.audio('gasSound', 'assets/audio/new/enemy.wav'); //Efecto cuando chocamos con enemigo gas
+        game.load.audio('powerUpSound', 'assets/audio/new/powerup.wav'); //Efecto cuando chocamos con una nave
+        game.load.audio('letterSound', 'assets/audio/new/letter.wav'); //Efecto cuando chocamos con una letra
+        game.load.audio('wordCompleted', 'assets/audio/new/wordcompleted.wav'); //Efecto cuando completamos una palabra
+        game.load.audio('jetpackSound', 'assets/audio/new/jetpack.wav'); //Sonidos para el jetpack
+        game.load.audio('walkingSound', 'assets/audio/new/run.wav'); //Sonidos para caminar
+        game.load.audio('loseSound', 'assets/audio/new/lose.wav'); //Sonidos para cuando perdemos
+        game.load.audio('bgm1', 'assets/audio/new/level'+level+'.wav'); //BGM
         //Level 2
         //Fonts
         game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
@@ -145,10 +151,8 @@ var gameState = {
         ratio = game.height/temp.height
         temp.destroy()
         
-        console.log(ratio);
+        //console.log(ratio);
         g_background.tileScale.set(ratio, ratio);
-        
-        backgroundv = -8;
 
         player = game.add.sprite(20, 300, 'dude');
         game.physics.enable(player, Phaser.Physics.ARCADE);
@@ -199,22 +203,38 @@ var gameState = {
         powerupExplosions = game.add.group();
         powerupExplosions.createMultiple(30, 'greenExplosion');
         powerupExplosions.forEach(this.setupPowerup, this);
+
+        //  An explosion pool for completed words
+        wordExplosions = game.add.group();
+        wordExplosions.createMultiple(50, 'starsExplosion');
+        wordExplosions.forEach(this.setupWord, this);
         
         //Audios
-        //TODO ALONSO : Agregar aqui los diferentes sonidos igual que como estan en nivel 1 (pero dependiendo)
+        //TODO ALONSO :
+        waterSound = game.add.audio('waterSound');
+        powerUpSound = game.add.audio('powerUpSound');
+        gasSound = game.add.audio('gasSound');
+        wordCompletedSound = game.add.audio('wordCompleted');
+        jetpackSound = game.add.audio('jetpackSound');
+        letterSound = game.add.audio('letterSound');
+        walkingSound = game.add.audio('walkingSound');
+        loseSound = game.add.audio('loseSound');
+
         if(level == 1) {
-            waterSound = game.add.audio('waterSound');
-            gasSound = game.add.audio('gasSound');
-            wordCompletedSound = game.add.audio('wordCompleted');
-            jetpackSound = game.add.audio('jetpackSound');
-            letterSound = game.add.audio('letterSound');
-            walkingSound = game.add.audio('walkingSound');
             bgmMusic = game.add.audio('bgm1');
             bgmMusic.loop = true;
-        } else if (level == 2) {
-
-        } else if (level == 3) {
-
+            levelVelocity = -400;
+            backgroundv = -8;
+        } else if (level == 2) {  
+            bgmMusic = game.add.audio('bgm1');
+            bgmMusic.loop = true;
+            levelVelocity = -600;
+            backgroundv = -15; 
+        } else if (level == 3) { 
+            bgmMusic = game.add.audio('bgm1');
+            bgmMusic.loop = true;
+            levelVelocity = -650;
+            backgroundv = -20; 
         }
 
         //Insert all audios
@@ -285,7 +305,7 @@ var gameState = {
             word3[5] = 'letterF';
             word3[6] = 'letterE';
             word3[7] = 'letterR';
-            word3[8] = 'letterA';
+            word3[8] = 'letterA'; 
 
         } else if (level == 2) {
             //Palabra 1
@@ -370,6 +390,9 @@ var gameState = {
         this.setEmitter();
         
         bgmMusic.play();
+        //Stop intro and typing sound
+        introSound.stop();
+        typeSound.stop();
     
     },
     
@@ -445,23 +468,23 @@ var gameState = {
     
     },
 
+    setupWord:function (light) {
+    
+        light.anchor.x = 0.5;
+        light.anchor.y = 0.5;
+        light.animations.add('starsExplosion');
+    
+    },
+
     setPlayer:function(){
         player.body.gravity.y = 500;
         player.body.collideWorldBounds = true; //collides with world walls
-        // player.body.setSize(25, 50);
         player.body.setSize(80, 110);
-        // player.scale.setTo(2,2);
         player.scale.setTo(1,1);
         player.body.checkCollision.up = false; //Turn off collisions up and down the player
         player.body.checkCollision.down = false;
         player.body.immovable = true; //Necessary for collision
-    
-        //Animation sprites
-        // player.animations.add('left', [0, 1, 2, 3], 10, true);
-        // player.animations.add('turn', [4], 20, true);
-        // player.animations.add('right', [5, 6, 7, 8], 10, true);
-        // player.animations.add('left', [0, 1, 2, 3], 10, true);
-        // player.animations.add('turn', [4], 20, true);
+
 
         player.animations.add('jump', [20], 20, true);
         player.animations.add('right', [9, 10], 10, true);
@@ -474,7 +497,7 @@ var gameState = {
 
     collisionHandler:function(player, enemies){
         //PLayers collide with enemy 
-        gasSound.play();
+        gasSound.play("", 0, 1, false, true);
         enemies.kill();
     
         // Create an explosion 
@@ -489,11 +512,6 @@ var gameState = {
         }
         //Player loses a life
     },
-
-    // backAction: function () {
-        
-    //     game.state.start('levels')
-    // },
     
     takeOffLive:function() {
         live = hearts.getFirstAlive();
@@ -513,16 +531,18 @@ var gameState = {
                     
                 }
             }
-            console.log(game.globalScores[0].playerName);
+            //console.log(game.globalScores[0].playerName);
             player.kill();
             enemies.kill();
             bgmMusic.stop();
+            walkingSound.stop();
+            loseSound.play("", 0, 6, false, true);
 
             stateText.text="       GAME OVER \n Click to go to Menu \n       Score: " + score;
             stateText.visible = true;
 
             //the "click to restart" handler
-            game.input.onTap.addOnce(this.restartGame,this);
+            game.input.onTap.addOnce(this.endGame, this);
         }
     },
 
@@ -546,6 +566,7 @@ var gameState = {
         var pointExplosion = pointExplosions.getFirstExists(false);
         pointExplosion.reset(points.body.x+30, points.body.y+30);
         pointExplosion.play('blueExplosion', 30, false, true);
+        
 
     },
 
@@ -553,7 +574,7 @@ var gameState = {
         //Player collides with a letter
         letters.kill();
         xMove += 60;
-        letterSound.play();
+        letterSound.play("", 0, 2, false, true);
 
         // Create an explosion 
         var letterExplosion = pointExplosions.getFirstExists(false);
@@ -572,6 +593,10 @@ var gameState = {
         if(wordArray.length == wordLength){
             console.log("You completed a word");
             wordCompletedSound.play();
+            // Create an explosion 
+            var wordExplosion = wordExplosions.getFirstExists(false);
+            wordExplosion.reset(750, boardPoint.body.y + 30);
+            wordExplosion.play('starsExplosion', 5, false, true);
             wordLength = 0;
             xMove = 0;
             this.addLive();
@@ -586,7 +611,8 @@ var gameState = {
         //Player collides with a point
         powerups.kill();
         pUActive = true;
-    
+        //sound 
+        powerUpSound.play("", 0, 4, false, true);
     
         // Create an explosion 
         var powerupExplosion = powerupExplosions.getFirstExists(false);
@@ -596,7 +622,7 @@ var gameState = {
         //set Player values
         player.loadTexture('ovni');
         player.body.setSize(1300, 1000);
-        player.scale.setTo(0.1,0.1);
+        player.scale.setTo(0.1, 0.1);
     },
     
     resetPlayer:function(){
@@ -610,26 +636,30 @@ var gameState = {
         player.scale.setTo(1,1);
     },
     
-    restartGame:function (){
-        // //  A new level starts
+    // restartGame:function (){
+    //     // //  A new level starts
     
-        //Reset background
-        g_background.loadTexture('background');
-        //Reset score
-        score = 0;
-        scoreText.text = "Score: "
-        //Reset lives 
-        for (i = 0; i < 3; i++){
-            var life = hearts.create((window.innerWidth-200) + (i*50), 50, 'lives');
-            life.scale.setTo(0.1,0.1);
-        }
-        //revives the player
-        player.revive();
-        //Reiniciamos word array a 0
-        wordLength = 0;
-        //hides the text
-        stateText.visible = false;
-        console.log(game.global.playerName, game.global.playerScore);
+    //     //Reset background
+    //     g_background.loadTexture('background');
+    //     //Reset score
+    //     score = 0;
+    //     scoreText.text = "Score: "
+    //     //Reset lives 
+    //     for (i = 0; i < 3; i++){
+    //         var life = hearts.create((window.innerWidth-200) + (i*50), 50, 'lives');
+    //         life.scale.setTo(0.1,0.1);
+    //     }
+    //     //revives the player
+    //     player.revive();
+    //     //Reiniciamos word array a 0
+    //     wordLength = 0;
+    //     //hides the text
+    //     stateText.visible = false;
+    //     //console.log(game.global.playerName, game.global.playerScore);
+    //     game.state.start('menu'); //Reiniciar al menu despues de perder
+    // },
+
+    endGame:function (){
         game.state.start('menu'); //Reiniciar al menu despues de perder
     },
     
@@ -658,12 +688,10 @@ var gameState = {
         //Player animation
         if (cursors.left.isDown)
         {
-            walkingSound.play("", 0, 1, false, true);
             player.x -= 8;
         }
         else if (cursors.right.isDown && (player.body.x < 200))
         {
-            walkingSound.play("", 0, 1, false, true);
             player.x += 8;
         }
         if (player.body.onFloor())
@@ -672,6 +700,8 @@ var gameState = {
             {
                 player.animations.play('right');
                 facing = 'right';
+                walkingSound.play("", 0, 5, false, true);
+                if(pUActive == true){walkingSound.stop();}
             }
         }
         else
@@ -695,15 +725,16 @@ var gameState = {
         //Jumps when space key is pressed
         if (jumpButton.isDown || game.input.activePointer.leftButton.isDown)
         {
-            // player.animations.stop();
             player.animations.play('jump');
-            jetpackSound.play("", 0, 1, false, true);
             player.body.velocity.y = -300
             player.body.acceleration.y = 600;
             emitter.on = true;
+            walkingSound.stop();
+            jetpackSound.play("", 0, 0.2, false, true);
         }
         else if (jumpButton.isUp){
             emitter.on = false;
+            jetpackSound.stop();
         }
     
         //Particles following the player 
@@ -752,7 +783,7 @@ var gameState = {
         //Create the random enemies
         if(swapDifficulty == true) {swapDifficulty = false}
         else {swapDifficulty = true}
-        console.log(swapDifficulty);
+        //console.log(swapDifficulty);
 
         lastYSpawn = ySpawn
         ySpawn = this.game.rnd.between(0, window.innerHeight);
@@ -760,17 +791,31 @@ var gameState = {
             ySpawn = this.game.rnd.between(0, 787);
         }
 
-        var ob = enemies.create(window.innerWidth, ySpawn, 'enemy');
+        // obtener número random: 1 o 2
+        var det = Math.floor(Math.random() * 3) + 1;
+        var ob;
+        if (det == 1) {
+            ob = enemies.create(window.innerWidth, ySpawn, 'enemy');
+            ob.scale.setTo(0.3, 0.3)
+        } else {
+            ob = enemies.create(window.innerWidth, ySpawn, 'enemy2');
+            ob.scale.setTo(0.2, 0.2)
+        }
+        // var ob = enemies.create(window.innerWidth, ySpawn, 'enemy');
         game.physics.enable(ob, Phaser.Physics.ARCADE);
-        ob.scale.setTo(0.3,0.3)
+        // ob.scale.setTo(0.3,0.3);
+        ob.body.setSize(400, 300);
         ob.body.velocity.x = -500;
 
-        //TODO LUCIA
         if(level == 2) 
-            game.physics.arcade.moveToObject(ob, player, 120) // el objeto sigue al usuario (es más difícil)
+            game.physics.arcade.moveToObject(ob, player, ((-1) * (levelVelocity + 300)), 3000) // el objeto sigue al usuario (es más difícil)
 
         if(level == 3 && swapDifficulty == true)
-            game.physics.arcade.moveToObject(ob, player, 120)
+            game.physics.arcade.moveToObject(ob, player,((-1) * (levelVelocity + 300)), 1000)
+        
+        if(level == 3 && swapDifficulty == false)
+            game.physics.arcade.moveToObject(ob, player,((-1) * (levelVelocity + 300)), 2000)
+
     },
     
     createPoints:function() {
@@ -784,7 +829,7 @@ var gameState = {
         var ob2 = points.create(window.innerWidth, ySpawn, 'light');
         game.physics.enable(ob2, Phaser.Physics.ARCADE);
         ob2.scale.setTo(0.1,0.1)
-        ob2.body.velocity.x = -400;
+        ob2.body.velocity.x = levelVelocity;
     
     
     },
@@ -803,11 +848,8 @@ var gameState = {
             game.physics.enable(ob3, Phaser.Physics.ARCADE);
             ob3.scale.setTo(0.1,0.1);
             ob3.body.setSize(1300, 1000);
-            ob3.body.velocity.x = -500;
-    
+            ob3.body.velocity.x = levelVelocity - 100;
         }
-    
-    
     },
 
 
@@ -820,24 +862,22 @@ var gameState = {
             wordArray = word2;
         if(randWord == 2)
             wordArray = word3;
-    
+
         console.log("word", wordArray);
     },
 
     createLetters:function(){
-        if(pUActive == false){
-            //Creates random objects that give the player points 
-            lastYSpawn = ySpawn
-            ySpawn = this.game.rnd.between(0, window.innerHeight);
-            while(ySpawn >= lastYSpawn - 75 && ySpawn <= lastYSpawn + 75){
-                ySpawn = this.game.rnd.between(0, 787);
-            }
-            var ob4 = letters.create(window.innerWidth, ySpawn, wordArray[wordLength]);
-            game.physics.enable(ob4, Phaser.Physics.ARCADE);
-            ob4.scale.setTo(0.3,0.3);
-            ob4.body.setSize(1300, 300);
-            ob4.body.velocity.x = -500;
+        //Creates random objects that give the player points 
+        lastYSpawn = ySpawn
+        ySpawn = this.game.rnd.between(0, window.innerHeight);
+        while(ySpawn >= lastYSpawn - 75 && ySpawn <= lastYSpawn + 75){
+            ySpawn = this.game.rnd.between(0, 787);
         }
+        var ob4 = letters.create(window.innerWidth, ySpawn, wordArray[wordLength]);
+        game.physics.enable(ob4, Phaser.Physics.ARCADE);
+        ob4.scale.setTo(0.3,0.3);
+        ob4.body.setSize(200, 200);
+        ob4.body.velocity.x = levelVelocity;
     },
 
     //Sounds

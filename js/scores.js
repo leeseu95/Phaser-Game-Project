@@ -10,7 +10,7 @@ WebFontConfig = {
 
     //  The Google Fonts we want to load (specify as many as you like in the array)
     google: {
-    families: ['Revalia']
+        families: ['Revalia', 'Roboto', 'Ubuntu']
     }
 
 };
@@ -26,12 +26,25 @@ var scoresState = {
 
     backAction: function () {
         game.state.start('menu');
-        console.log(game.globalScores[0]);
+        // console.log(game.globalScores[0]);
+    },
+
+    preload: function () {
+
+        // background
+        game.load.image('s_background','assets/backgrounds/highscores_filled.png');
+        
     },
     
     saveAction: function () {},
 
     create: function (){
+
+        // Prioridad de background: height
+        s_background = game.add.sprite(0, 0, 's_background');
+        s_background.width = game.width;
+        s_background.scale.y = s_background.scale.x;
+
         this.createText();
 
         b_button = game.add.button(game.world.width/30, game.world.height/6*5, 'b_button', this.backAction, this, 2, 1, 0);
@@ -39,7 +52,7 @@ var scoresState = {
 
     createText: function() {
         //  The score
-        highestScoreText = game.add.text(game.world.centerX-375, 75, "Highest Scores");
+        highestScoreText = game.add.text(game.world.centerX-375, 75, "");
         highestScoreText.font = 'Revalia';
         highestScoreText.fontSize = '84px';
         highestScoreText.fill = "#ff0ff";

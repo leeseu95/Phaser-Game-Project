@@ -20,19 +20,30 @@ var menuState = {
         // go button
         game.load.spritesheet('g_button', 'assets/buttons/g_button2.png', 190, 49);
 
+        // skip button
+        game.load.spritesheet('s_button', 'assets/buttons/s_button2.png', 190, 49);
+
+        // select button
+        game.load.spritesheet('l_button', 'assets/buttons/l_button2.png', 190, 49);
+
         // background
         game.load.image('background','assets/backgrounds/main.png');
 
         // logo
         game.load.image('logo','assets/misc/logo.png');
+
+        //sound
+        game.load.audio('intro', 'assets/audio/new/intro.mp3');
     },
     
     // action functions for each button
     creditsAction: function () {game.state.start('credits')},
     playAction: function () {game.state.start('levels')},
     howAction: function () {game.state.start('how')},
-    scoresAction: function () {
-        game.state.start('scores');
+    scoresAction: function () {game.state.start('scores')},
+
+    render: function (){
+        // console.log(introSound.isPlaying)
     },
 
     // main function
@@ -84,5 +95,14 @@ var menuState = {
 
         // botón de high scores
         h_button = game.add.button(game.world.centerX + 170, game.world.centerY + 140, 't_button', this.scoresAction, this, 2, 1, 0);
+
+        //sound
+        if (introSound == 'undefined') {
+            introSound = game.add.audio('intro');
+            introSound.allowMultiple = false;
+            introSound.play("", 0, 1, false, true);
+        } else {
+            console.log("prevented restart")
+        }
     }
 }

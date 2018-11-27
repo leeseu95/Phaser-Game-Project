@@ -52,13 +52,14 @@ var charactersState = {
     preload: function() {
 
         // background
-        game.load.image('h_background','assets/backgrounds/characters.png');
+        game.load.image('h_background','assets/backgrounds/characters_filled.png');
         
         // personajes
         game.load.image('char1','assets/characters/selection/1.png');
         game.load.image('char2','assets/characters/selection/2.png');
         game.load.image('char3','assets/characters/selection/3.png');
         game.load.image('char4','assets/characters/selection/4.png');
+        // 80 x 110
     },
 
     create: function (){
@@ -68,18 +69,36 @@ var charactersState = {
         h_background.scale.y = h_background.scale.x;
 
         // Título
-        label = game.add.text(80, 80, "Character Selection", {font: '50px Arial', fill: '#ffffff'});
+        style = {font: '30px Arial', fill: '#ffffff', boundsAlignH: "center", boundsAlignV: "middle"}
+        label = game.add.text(0, 0, "Enter your name here!", style);
+        label.setTextBounds(0, 0, window.innerWidth, window.innerWidth/3);
 
         // Personajes
-        c1 = game.add.sprite(game.world.centerX-400,game.world.centerY-80, 'char1');
-        c2 = game.add.sprite(game.world.centerX-200,game.world.centerY-80, 'char2');
-        c3 = game.add.sprite(game.world.centerX+200,game.world.centerY-80, 'char3');
-        c4 = game.add.sprite(game.world.centerX+400,game.world.centerY-80, 'char4');
+        // console.log(game.world.width)
+        // console.log(game.world.height)
+
+        // 1: 0 - game.world.width/4
+        // 2: game.world.width/4 - (game.world.width/4*2)
+        // 3: (game.world.width/4*2) - (game.world.width/4*3)
+        // 4: (game.world.width/4*3) - game.world.width
+
+        // CENTROS
+        //game.world.width/8
+        //(game.world.width/4*2) - game.world.width/8
+        //(game.world.width/4*3) - game.world.width/8
+        //game.world.width - game.world.width/8
+
+        // RESTAR LA MITAD DEL WIDTH DEL OBJETO A LOS CENTROS
+
+        c1 = game.add.sprite((game.world.width/8)-40, game.world.centerY-80, 'char1');
+        c2 = game.add.sprite(((game.world.width/4*2) - game.world.width/8)-40, game.world.centerY-80, 'char2');
+        c3 = game.add.sprite(((game.world.width/4*3) - game.world.width/8)-40, game.world.centerY-80, 'char3');
+        c4 = game.add.sprite((game.world.width - game.world.width/8)-40, game.world.centerY-80, 'char4');
 
         // importar el plugin
         game.add.plugin(PhaserInput.Plugin);
 
-        textInput = game.add.inputField(game.world.centerX, game.world.centerY, {
+        textInput = game.add.inputField(game.world.centerX-75, game.world.centerY-100, {
             font: '20px Arial',
             fill: '#212121',
             fontWeight: 'bold',
@@ -94,12 +113,13 @@ var charactersState = {
         });
 
         // Botones
-        l1_button = game.add.button(game.world.centerX-400,game.world.centerY+80,'p_button', this.charOne, this, 2, 1, 0)
-        l2_button = game.add.button(game.world.centerX-200,game.world.centerY+80,'p_button', this.charTwo, this, 2, 1, 0)
-        l3_button = game.add.button(game.world.centerX+200,game.world.centerY+80,'p_button', this.charThree, this, 2, 1, 0)
-        l4_button = game.add.button(game.world.centerX+400,game.world.centerY+80,'p_button', this.charFour, this, 2, 1, 0)
+        l1_button = game.add.button((game.world.width/8)-95, game.world.centerY+50,'l_button', this.charOne, this, 2, 1, 0)
+        l2_button = game.add.button(((game.world.width/4*2) - game.world.width/8)-95, game.world.centerY+50,'l_button', this.charTwo, this, 2, 1, 0)
+        l3_button = game.add.button(((game.world.width/4*3) - game.world.width/8)-95,game.world.centerY+50,'l_button', this.charThree, this, 2, 1, 0)
+        l4_button = game.add.button((game.world.width - game.world.width/8)-95,game.world.centerY+50,'l_button', this.charFour, this, 2, 1, 0)
 
         b_button = game.add.button(game.world.width/30, game.world.height/6*5, 'b_button', this.backAction, this, 2, 1, 0);
+
     }
 }
 

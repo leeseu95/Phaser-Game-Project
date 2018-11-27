@@ -46,6 +46,8 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 
         // highscores
         h_button = game.add.button(game.world.centerX + 170, game.world.centerY + 140, 't_button', scoresAction, this, 2, 1, 0);
+
+
     }
 
     function creditsAction () {
@@ -56,7 +58,7 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 
     function playAction () {
 
-        game.state.start('game')
+        // game.state.start('game')
 
     }
 

@@ -12,6 +12,8 @@ game.state.add('game', gameState)
 game.state.add('characters', charactersState)
 game.state.add('intro', introState)
 
+introSound = 'undefined'
+
 //KEY: DESCOMENTAR ESTA LINEA Y CAMBIARLA DE VUELTA PARA QUE SIRVAN BIEN LOS MENUS
 game.state.start('menu')
 // game.state.start('game')

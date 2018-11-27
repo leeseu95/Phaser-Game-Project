@@ -3,13 +3,15 @@
 var creditsState = {
 
     backAction: function () {
-        
-        game.state.start('menu')},
+        game.state.start('menu')
+        // introSound.stop();
+    },
 
     preload: function () {
 
         // background
         game.load.image('c_background','assets/backgrounds/credits_filled.png');
+
         
     },
 
@@ -20,7 +22,6 @@ var creditsState = {
         c_background.width = game.width;
         c_background.scale.y = c_background.scale.x;
 
-        // b_button = game.add.button(game.world.centerX - 500, game.world.centerY + 200, 'b_button', this.backAction, this, 2, 1, 0);
         b_button = game.add.button(game.world.width/30, game.world.height/6*5, 'b_button', this.backAction, this, 2, 1, 0);
     }
 }
