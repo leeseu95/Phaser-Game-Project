@@ -1,0 +1,17 @@
+{
+  "name": "Seung2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/leeseu95/Phaser-Game-Project.git",
+  "author": "Gual Casas <gualcm@teclag.com>",
+  "license": "MIT",
+  "scripts": {
+     "start": "http-server"
+  },
+  "dependencies": {
+    "@orange-games/phaser-input": "^2.0.5"
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1",
+  }
+}
