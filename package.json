@@ -6,12 +6,11 @@
   "author": "Gual Casas <gualcm@teclag.com>",
   "license": "MIT",
   "scripts": {
-     "start": "http-server"
+    "start": "http-server"
   },
   "dependencies": {
-    "@orange-games/phaser-input": "^2.0.5"
   },
   "devDependencies": {
-    "http-server": "^0.11.1",
+    "http-server": "^0.11.1"
   }
 }
